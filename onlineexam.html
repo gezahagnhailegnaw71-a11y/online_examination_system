@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DBU e-Learning Examination & Auto-Grading System</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dbu: {
+                            navy: '#0A192F',
+                            blue: '#1E3A8A',
+                            gold: '#D97706',
+                            goldlight: '#F59E0B',
+                            green: '#059669',
+                            lightbg: '#F8FAFC'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .tab-active { border-bottom: 3px solid #D97706; color: #1E3A8A; font-weight: 700; }
+        @keyframes pulse-subtle { 0%, 100% { opacity: 1; } 50% { opacity: 0.85; } }
+        .eco-badge { animation: pulse-subtle 2s infinite; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- REGISTER MODAL -->
+    <div id="register-modal" class="fixed inset-0 bg-dbu-navy/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-gradient-to-r from-dbu-navy to-dbu-blue p-6 text-center text-white relative">
+                <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-dbu-gold flex items-center justify-center font-black text-dbu-navy text-2xl border-2 border-white shadow-lg">
+                    DBU
+                </div>
+                <h2 class="text-xl font-bold tracking-wide">Debre Berhan University</h2>
+                <p class="text-xs text-amber-400 font-medium tracking-wider mt-0.5">COMPUTING COLLEGE e-Learning REGISTRATION</p>
+            </div>
+
+            <form id="register-form" onsubmit="handleRegistration(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Full Name</label>
+                    <input type="text" id="reg-fullname" required placeholder="e.g. Abebe Kebede" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Computing Department</label>
+                    <select id="reg-department" required class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                        <option value="">Select Department</option>
+                        <option value="Software Engineering">Software Engineering</option>
+                        <option value="Computer Science">Computer Science</option>
+                        <option value="Information Technology">Information Technology</option>
+                        <option value="Information Systems">Information Systems</option>
+                        <option value="Data Science">Data Science</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Username</label>
+                    <input type="text" id="reg-username" required placeholder="e.g. abebe_k" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">e-Learning Email Address (for Login)</label>
+                    <input type="email" id="reg-email" required placeholder="e.g. kebede@dbu.edu.et" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Strong Password</label>
+                    <input type="password" id="reg-password" required placeholder="Min 6 chars, letters & numbers" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                    <p class="text-[10px] text-slate-500 mt-1">Must contain at least 6 characters, including letters and numbers.</p>
+                </div>
+
+                <div id="reg-error" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg font-semibold flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="reg-error-msg">Please enter a strong password.</span>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Register Account & Proceed to Login</span>
+                </button>
+
+                <div class="text-center pt-2 border-t border-slate-100">
+                    <button type="button" onclick="showLoginModal()" class="text-xs text-dbu-blue font-bold hover:underline">
+                        Already registered? Sign In here <i class="fas fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-overlay" class="fixed inset-0 bg-dbu-navy/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
+            <div class="bg-gradient-to-r from-dbu-navy to-dbu-blue p-6 text-center text-white relative">
+                <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-dbu-gold flex items-center justify-center font-black text-dbu-navy text-2xl border-2 border-white shadow-lg">
+                    DBU
+                </div>
+                <h2 class="text-xl font-bold tracking-wide">Debre Berhan University</h2>
+                <p class="text-xs text-amber-400 font-medium tracking-wider mt-0.5">COMPUTING COLLEGE e-Learning SIGN IN</p>
+            </div>
+
+            <form id="login-form" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">e-Learning Email Address</label>
+                    <div class="relative">
+                        <i class="fas fa-envelope absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="email" id="login-email" required placeholder="e.g. kebede@dbu.edu.et" class="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Password</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="password" id="login-password" required placeholder="••••••••" class="w-full pl-9 pr-10 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-dbu-blue">
+                        <button type="button" onclick="togglePasswordVisibility('login-password')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-sm">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="login-error" class="hidden text-xs text-rose-600 bg-rose-50 border border-rose-200 p-2.5 rounded-lg font-semibold flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span id="login-error-msg">Invalid credentials.</span>
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-dbu-blue hover:bg-blue-900 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Secure Sign In</span>
+                </button>
+
+                <div class="flex justify-between items-center text-xs pt-2 border-t border-slate-100">
+                    <button type="button" onclick="showRegisterModal()" class="text-dbu-blue font-bold hover:underline">
+                        <i class="fas fa-user-plus mr-1"></i> Register New Account
+                    </button>
+                    <button type="button" onclick="fillDemoUser('student1@dbu.edu.et', 'Password123')" class="text-slate-500 hover:text-slate-700 font-mono">
+                        Demo Login
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN NAVBAR -->
+    <header id="main-header" class="hidden bg-dbu-navy text-white shadow-lg border-b-4 border-dbu-gold sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-full bg-dbu-gold flex items-center justify-center font-extrabold text-dbu-navy text-xl border-2 border-white shadow-md">
+                        DBU
+                    </div>
+                    <div>
+                        <h1 class="text-lg sm:text-xl font-bold tracking-wide text-white">DEBRE BERHAN UNIVERSITY</h1>
+                        <p class="text-xs text-amber-400 font-medium tracking-wider">COMPUTING COLLEGE e-Learning EXAM PORTAL</p>
+                    </div>
+                </div>
+
+                <div class="hidden md:flex items-center space-x-2 bg-emerald-950/70 border border-emerald-500/40 text-emerald-300 px-3 py-1.5 rounded-full text-xs font-semibold eco-badge">
+                    <i class="fas fa-leaf text-emerald-400 text-sm"></i>
+                    <span>Green DBU: Zero Paper Initiative</span>
+                </div>
+
+                <div class="flex items-center space-x-3">
+                    <div class="hidden sm:block text-right text-xs">
+                        <div class="font-bold text-slate-200" id="user-display-name">---</div>
+                        <div class="text-slate-400" id="user-display-email">---</div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-dbu-blue border-2 border-amber-500 flex items-center justify-center text-white font-bold">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <button onclick="handleLogout()" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-xs font-bold transition-colors ml-2">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <nav class="bg-slate-900 border-t border-slate-800 px-4">
+            <div class="max-w-7xl mx-auto flex space-x-4 sm:space-x-8 text-sm">
+                <button id="nav-dashboard" onclick="switchMainTab('dashboard')" class="py-3 px-4 text-slate-300 hover:text-white font-medium flex items-center space-x-2 tab-active transition-all">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard & Courses</span>
+                </button>
+                <button id="nav-results" onclick="switchMainTab('results')" class="py-3 px-4 text-slate-300 hover:text-white font-medium flex items-center space-x-2 transition-all">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Grades & Course Status</span>
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main id="main-content" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+
+        <!-- OFFICIAL PORTALS BAR -->
+        <div class="bg-gradient-to-r from-blue-900 to-dbu-navy text-white p-4 rounded-xl shadow-md mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-amber-500 text-dbu-navy rounded-lg font-bold text-lg"><i class="fas fa-globe"></i></div>
+                <div>
+                    <h4 class="font-bold text-sm">Official Debre Berhan University e-Learning Links</h4>
+                    <p class="text-xs text-slate-300">Computing College Portal Services</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 text-xs font-semibold">
+                <a href="https://courses.dbu.edu.et/" target="_blank" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-amber-300 flex items-center gap-1">
+                    <i class="fas fa-graduation-cap"></i> e-Learning
+                </a>
+                <a href="https://studentportal.dbu.edu.et/" target="_blank" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-emerald-300 flex items-center gap-1">
+                    <i class="fas fa-id-badge"></i> Student Portal
+                </a>
+                <a href="https://sims.dbu.edu.et/" target="_blank" class="px-3 py-1.5 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sky-300 flex items-center gap-1">
+                    <i class="fas fa-database"></i> SIMS Grades
+                </a>
+            </div>
+        </div>
+
+        <!-- DASHBOARD VIEW -->
+        <div id="view-dashboard" class="space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center space-x-4">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 border-2 border-dbu-blue flex items-center justify-center text-dbu-blue text-2xl font-bold">
+                        <i class="fas fa-laptop-code"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold text-dbu-navy" id="student-name-header">---</h2>
+                        <p class="text-sm font-semibold text-dbu-blue" id="student-dept-header">---</p>
+                        <p class="text-xs text-slate-500 mt-0.5">Computing College e-Learning • 7 Enrolled Courses • 100 Questions • 2 Hours Limit</p>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <span class="bg-blue-50 text-dbu-blue border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold">
+                        <i class="fas fa-shield-alt mr-1"></i> e-Learning Account Verified
+                    </span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-book-open text-dbu-gold"></i> Your 7 Assigned Courses (100 Questions | 2 Hours Limit)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="courses-grid">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+        </div>
+
+        <!-- LIVE EXAM VIEW -->
+        <div id="view-exam" class="hidden space-y-6">
+            <div class="bg-dbu-navy text-white p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div>
+                    <span id="exam-course-dept" class="bg-amber-500 text-slate-900 text-xs px-2.5 py-1 rounded font-bold uppercase tracking-wider">Department</span>
+                    <h2 id="exam-course-title" class="text-2xl font-bold mt-1">Course Title</h2>
+                    <p class="text-xs text-slate-300 mt-1"><i class="fas fa-question-circle mr-1"></i> 100 Questions Total • Active A, B, C, D Choices • Auto-Graded</p>
+                </div>
+                <div class="bg-slate-800 border-2 border-amber-400 px-5 py-3 rounded-xl text-center min-w-[160px]">
+                    <div class="text-xs text-amber-300 font-semibold uppercase tracking-wider">Time Remaining (2 Hours)</div>
+                    <div id="exam-timer" class="text-3xl font-extrabold text-white font-mono mt-0.5">120:00</div>
+                </div>
+            </div>
+
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex justify-between items-center text-xs font-bold text-slate-600">
+                <span id="question-tracker">Question 1 of 100</span>
+                <span id="answered-progress">0 Answered</span>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-md border border-slate-200 space-y-6 min-h-[300px] flex flex-col justify-between">
+                <div>
+                    <h4 id="question-text" class="text-lg font-bold text-slate-900 mb-6">Question text goes here...</h4>
+                    <div id="options-container" class="space-y-3">
+                        <!-- Options injected dynamically with A, B, C, D -->
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-6 border-t border-slate-100">
+                    <button onclick="prevQuestion()" id="btn-prev" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition-all flex items-center gap-2">
+                        <i class="fas fa-arrow-left"><span>Previous</span></i>
+                    </button>
+                    <button onclick="nextQuestion()" id="btn-next" class="px-6 py-2.5 bg-dbu-blue hover:bg-blue-900 text-white font-bold rounded-lg shadow transition-all flex items-center gap-2">
+                        <span>Next</span><i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                <button onclick="confirmExitExam()" class="px-5 py-2 rounded-lg border border-slate-300 text-slate-700 font-semibold text-xs hover:bg-slate-50">
+                    <i class="fas fa-times mr-1"></i> Exit Without Saving
+                </button>
+                <button onclick="submitExam()" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center gap-2">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Finish & Submit All 100 Questions</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- RESULTS & COURSE TRANSCRIPT VIEW -->
+        <div id="view-results" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-dbu-navy to-dbu-blue text-white p-8 text-center">
+                    <div class="w-16 h-16 mx-auto mb-3 rounded-full bg-amber-500 text-dbu-navy flex items-center justify-center text-3xl font-bold shadow-lg">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold">Official Course Result & Grade Report</h2>
+                    <p class="text-slate-300 text-sm mt-1">Debre Berhan University Computing College e-Learning</p>
+                </div>
+
+                <div class="p-8 space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-500 uppercase font-bold">Course Score</span>
+                            <div class="text-3xl font-black text-dbu-blue mt-1" id="res-score">0 / 100</div>
+                            <span class="text-xs text-slate-500" id="res-pct">0% Percentage</span>
+                        </div>
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
+                            <span class="text-xs text-slate-500 uppercase font-bold">Letter Grade</span>
+                            <div class="text-3xl font-black text-amber-600 mt-1" id="res-grade">-</div>
+                            <span class="text-xs text-slate-500">DBU Grading Scale</span>
+                        </div>
+                        <div class="bg-emerald-50 p-5 rounded-xl border border-emerald-200">
+                            <span class="text-xs text-emerald-700 uppercase font-bold">Eco Impact</span>
+                            <div class="text-2xl font-bold text-emerald-700 mt-1">Zero Paper</div>
+                            <span class="text-xs text-emerald-600">Digital e-Learning System</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <h3 class="text-xl font-bold text-slate-800"><i class="fas fa-list-alt text-dbu-blue mr-2"></i> Your Completed Course Grades & Values</h3>
+                        <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                            <table class="w-full text-left text-sm text-slate-600">
+                                <thead class="bg-slate-100 text-xs uppercase text-slate-700">
+                                    <tr>
+                                        <th class="p-3.5">Course Title</th>
+                                        <th class="p-3.5">Score (out of 100)</th>
+                                        <th class="p-3.5">Letter Grade</th>
+                                        <th class="p-3.5">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transcript-table-body" class="divide-y divide-slate-200 bg-white">
+                                    <!-- Injected transcripts -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t border-slate-200">
+                        <button onclick="switchMainTab('dashboard')" class="px-6 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition-all">
+                            <i class="fas fa-arrow-left mr-2"></i> Back to Dashboard
+                        </button>
+                        <button onclick="window.print()" class="px-6 py-2.5 bg-dbu-blue hover:bg-blue-900 text-white font-bold rounded-lg shadow transition-all">
+                            <i class="fas fa-print mr-2"></i> Print Official Result Sheet
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- JAVASCRIPT SYSTEM LOGIC -->
+    <script>
+        const departments = [
+            "Software Engineering",
+            "Computer Science",
+            "Information Technology",
+            "Information Systems",
+            "Data Science"
+        ];
+
+        const courses = [
+            "Programming Fundamentals (Java/C++)",
+            "Database Systems & SQL",
+            "Web Development & Systems",
+            "Computer Networks & Security",
+            "Data Structures & Algorithms",
+            "Operating Systems",
+            "Software Engineering Principles"
+        ];
+
+        // Preload 250 students + Admin with Email as primary key
+        let studentDatabase = {};
+        departments.forEach((dept, dIdx) => {
+            for (let i = 1; i <= 50; i++) {
+                let userIndex = (dIdx * 50) + i;
+                let uemail = `student${userIndex}@dbu.edu.et`;
+                let uname = `student${userIndex}`;
+                let studentId = `DBU/16/${String(userIndex).padStart(4, '0')}`;
+                
+                studentDatabase[uemail] = {
+                    username: uname,
+                    email: uemail,
+                    password: "Password123",
+                    name: `Student ${userIndex} (${dept.split(' ')[0]})`,
+                    id: studentId,
+                    department: dept,
+                    results: {}
+                };
+            }
+        });
+
+        // Add custom student match for kebede@dbu.edu.et
+        studentDatabase["kebede@dbu.edu.et"] = {
+            username: "kebede_k",
+            email: "kebede@dbu.edu.et",
+            password: "Password123",
+            name: "Abebe Kebede",
+            id: "DBU/16/0042",
+            department: "Software Engineering",
+            results: {}
+        };
+
+        studentDatabase["admin@dbu.edu.et"] = {
+            username: "admin",
+            email: "admin@dbu.edu.et",
+            password: "AdminPassword123",
+            name: "System Administrator",
+            id: "DBU/ADMIN/01",
+            department: "Computing College Administration",
+            isAdmin: true
+        };
+
+        let currentUser = null;
+        let activeCourse = null;
+        let currentQuestions = [];
+        let currentQuestionIdx = 0;
+        let userAnswers = {};
+        let timerInterval = null;
+        let timeRemaining = 7200; // 2 hours (120 minutes)
+
+        // Modal Toggles
+        function showRegisterModal() {
+            document.getElementById('login-overlay').classList.add('hidden');
+            document.getElementById('register-modal').classList.remove('hidden');
+        }
+
+        function showLoginModal() {
+            document.getElementById('register-modal').classList.add('hidden');
+            document.getElementById('login-overlay').classList.remove('hidden');
+        }
+
+        // Handle Registration with Email as Unique Key
+        function handleRegistration(e) {
+            e.preventDefault();
+            const fullName = document.getElementById('reg-fullname').value.trim();
+            const dept = document.getElementById('reg-department').value;
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim().toLowerCase();
+            const password = document.getElementById('reg-password').value;
+            const errBox = document.getElementById('reg-error');
+            const errMsg = document.getElementById('reg-error-msg');
+
+            const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!\%*?&]{6,}$/;
+
+            if (!strongPasswordRegex.test(password)) {
+                errBox.classList.remove('hidden');
+                errMsg.innerText = "Password must be at least 6 characters long and include both letters and numbers.";
+                return;
+            }
+
+            if (studentDatabase[email]) {
+                errBox.classList.remove('hidden');
+                errMsg.innerText = "Email already registered. Please sign in.";
+                return;
+            }
+
+            studentDatabase[email] = {
+                username: username,
+                email: email,
+                password: password,
+                name: fullName,
+                id: `DBU/26/${Math.floor(1000 + Math.random() * 9000)}`,
+                department: dept,
+                results: {}
+            };
+
+            alert("Registration successful! Please sign in with your e-Learning email and password.");
+            showLoginModal();
+            document.getElementById('register-form').reset();
+            errBox.classList.add('hidden');
+        }
+
+        // Login Handler (Email + Password)
+        function handleLogin(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('login-email').value.trim().toLowerCase();
+            const p = document.getElementById('login-password').value.trim();
+            const errBox = document.getElementById('login-error');
+            const errMsg = document.getElementById('login-error-msg');
+
+            if (studentDatabase[emailInput] && studentDatabase[emailInput].password === p) {
+                currentUser = studentDatabase[emailInput];
+                document.getElementById('login-overlay').classList.add('hidden');
+                document.getElementById('main-header').classList.remove('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+
+                document.getElementById('user-display-name').innerText = currentUser.name;
+                document.getElementById('user-display-email').innerText = currentUser.email;
+
+                initDashboard();
+            } else {
+                errBox.classList.remove('hidden');
+                errMsg.innerText = "Invalid e-Learning email or password. Please check your credentials.";
+            }
+        }
+
+        function fillDemoUser(email, p) {
+            document.getElementById('login-email').value = email;
+            document.getElementById('login-password').value = p;
+        }
+
+        function togglePasswordVisibility(id) {
+            const el = document.getElementById(id);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            clearInterval(timerInterval);
+            document.getElementById('main-header').classList.add('hidden');
+            document.getElementById('main-content').classList.add('hidden');
+            showLoginModal();
+            document.getElementById('login-form').reset();
+        }
+
+        function switchMainTab(tab) {
+            document.getElementById('nav-dashboard').className = tab === 'dashboard' ? 'py-3 px-4 text-slate-300 hover:text-white font-medium flex items-center space-x-2 tab-active transition-all' : 'py-3 px-4 text-slate-300 hover:text-white font-medium flex items-center space-x-2 transition-all';
+            document.getElementById('nav-results').className = tab === 'results' ? 'py-3 px-4 text-slate-300 hover:text-white font-medium flex items-center space-x-2 tab-active transition-all' : 'py-3 px-4 text-slate-300 hover:text-white font-medium flex items-center space-x-2 transition-all';
+
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-exam').classList.add('hidden');
+            document.getElementById('view-results').classList.add('hidden');
+
+            if (tab === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                initDashboard();
+            } else if (tab === 'results') {
+                document.getElementById('view-results').classList.remove('hidden');
+                renderTranscriptTable();
+            }
+        }
+
+        function initDashboard() {
+            document.getElementById('student-name-header').innerText = currentUser.name;
+            document.getElementById('student-dept-header').innerText = currentUser.department;
+
+            const grid = document.getElementById('courses-grid');
+            grid.innerHTML = '';
+
+            courses.forEach(course => {
+                let hasTaken = currentUser.results && currentUser.results[course];
+                let card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-xl shadow-sm border border-slate-200 flex flex-col justify-between hover:shadow-md transition-shadow";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="px-2.5 py-1 bg-slate-100 text-dbu-blue text-xs font-bold rounded-md">Computing Course</span>
+                            ${hasTaken ? '<span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-md"><i class="fas fa-check mr-1"></i> Completed</span>' : '<span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-md">Pending</span>'}
+                        </div>
+                        <h4 class="font-bold text-lg text-slate-900 mb-1">${course}</h4>
+                        <p class="text-xs text-slate-500 mb-4">100 Questions • Active A,B,C,D Choices • 2 Hours</p>
+                    </div>
+                    <div>
+                        <button onclick="startExam('${course}')" class="w-full py-2.5 ${hasTaken ? 'bg-slate-800 hover:bg-slate-900' : 'bg-dbu-blue hover:bg-blue-900'} text-white font-bold rounded-lg text-sm transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-play-circle"></i> ${hasTaken ? 'Retake / Review Exam' : 'Start Exam Now'}
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Generate Unique 100 Questions in Series for Each Course
+        function generate100Questions(courseName) {
+            let qList = [];
+            let prefix = courseName.split(' ')[0].toUpperCase();
+            for (let i = 1; i <= 100; i++) {
+                qList.push({
+                    id: i,
+                    question: `[${courseName}] Series Question #${i}: Core concepts and advanced assessment items for ${prefix} module sequence.`,
+                    options: [
+                        { label: 'A', text: `Primary execution structure for ${prefix} item ${i}` },
+                        { label: 'B', text: `Alternative operational model for ${prefix} item ${i}` },
+                        { label: 'C', text: `Correct Answer for ${prefix} Q${i}` },
+                        { label: 'D', text: `Deprecated legacy protocol for ${prefix} item ${i}` }
+                    ],
+                    answer: `Correct Answer for ${prefix} Q${i}`
+                });
+            }
+            return qList;
+        }
+
+        function startExam(courseName) {
+            activeCourse = courseName;
+            currentQuestions = generate100Questions(courseName);
+            currentQuestionIdx = 0;
+            userAnswers = {};
+            timeRemaining = 7200; // 2 hours
+
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-results').classList.add('hidden');
+            document.getElementById('view-exam').classList.remove('hidden');
+
+            document.getElementById('exam-course-title').innerText = courseName;
+            document.getElementById('exam-course-dept').innerText = currentUser.department;
+
+            renderQuestion();
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (timeRemaining > 0) {
+                    timeRemaining--;
+                    let hours = Math.floor(timeRemaining / 3600);
+                    let mins = Math.floor((timeRemaining % 3600) / 60);
+                    let secs = timeRemaining % 60;
+                    document.getElementById('exam-timer').innerText = `${hours > 0 ? hours + ':' : ''}${mins < 10 && hours > 0 ? '0' : ''}${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                } else {
+                    clearInterval(timerInterval);
+                    alert("2-Hour time limit reached! Submitting exam automatically.");
+                    submitExam();
+                }
+            }, 1000);
+        }
+
+        function renderQuestion() {
+            let q = currentQuestions[currentQuestionIdx];
+            document.getElementById('question-tracker').innerText = `Question ${currentQuestionIdx + 1} of 100`;
+            document.getElementById('question-text').innerText = `Q${currentQuestionIdx + 1}: ${q.question}`;
+
+            let optContainer = document.getElementById('options-container');
+            optContainer.innerHTML = '';
+
+            q.options.forEach((opt) => {
+                let isChecked = userAnswers[q.id] === opt.text;
+                let div = document.createElement('label');
+                div.className = `flex items-center p-3.5 rounded-xl border ${isChecked ? 'border-dbu-blue bg-blue-50/50' : 'border-slate-200 hover:bg-slate-50'} cursor-pointer transition-all`;
+                div.innerHTML = `
+                    <input type="radio" name="exam_option" value="${opt.text}" ${isChecked ? 'checked' : ''} onchange="saveAnswer(${q.id}, '${opt.text}')" class="w-4 h-4 text-dbu-blue mr-3">
+                    <span class="w-7 h-7 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center font-bold text-xs text-dbu-navy mr-3">${opt.label}</span>
+                    <span class="text-sm font-medium text-slate-700">${opt.text}</span>
+                `;
+                optContainer.appendChild(div);
+            });
+
+            document.getElementById('btn-prev').style.visibility = currentQuestionIdx === 0 ? 'hidden' : 'visible';
+            let nextBtnText = currentQuestionIdx === currentQuestions.length - 1 ? 'Review & Finish' : 'Next';
+            document.getElementById('btn-next').innerHTML = `<span>${nextBtnText}</span><i class="fas fa-arrow-right"></i>`;
+
+            let answeredCount = Object.keys(userAnswers).length;
+            document.getElementById('answered-progress').innerText = `${answeredCount} / 100 Answered`;
+        }
+
+        function saveAnswer(qId, val) {
+            userAnswers[qId] = val;
+            let answeredCount = Object.keys(userAnswers).length;
+            document.getElementById('answered-progress').innerText = `${answeredCount} / 100 Answered`;
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIdx < currentQuestions.length - 1) {
+                currentQuestionIdx++;
+                renderQuestion();
+            } else {
+                submitExam();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentQuestionIdx > 0) {
+                currentQuestionIdx--;
+                renderQuestion();
+            }
+        }
+
+        function confirmExitExam() {
+            if (confirm("Are you sure you want to exit? Your progress for this exam will be lost.")) {
+                clearInterval(timerInterval);
+                switchMainTab('dashboard');
+            }
+        }
+
+        function calculateGrade(score) {
+            let grade = "F";
+            if (score >= 90) grade = "A+";
+            else if (score >= 85) grade = "A";
+            else if (score >= 80) grade = "A-";
+            else if (score >= 75) grade = "B+";
+            else if (score >= 70) grade = "B";
+            else if (score >= 65) grade = "B-";
+            else if (score >= 60) grade = "C+";
+            else if (score >= 50) grade = "C";
+            else grade = "F";
+            return grade;
+        }
+
+        function submitExam() {
+            clearInterval(timerInterval);
+
+            let correctCount = 0;
+            currentQuestions.forEach(q => {
+                if (userAnswers[q.id] === q.answer) {
+                    correctCount++;
+                }
+            });
+
+            let grade = calculateGrade(correctCount);
+
+            if (!currentUser.results) currentUser.results = {};
+            currentUser.results[activeCourse] = {
+                score: correctCount,
+                grade: grade,
+                date: new Date().toLocaleDateString()
+            };
+
+            document.getElementById('view-exam').classList.add('hidden');
+            document.getElementById('view-results').classList.remove('hidden');
+
+            document.getElementById('res-score').innerText = `${correctCount} / 100`;
+            document.getElementById('res-pct').innerText = `${correctCount}% Percentage`;
+            document.getElementById('res-grade').innerText = grade;
+
+            renderTranscriptTable();
+        }
+
+        function renderTranscriptTable() {
+            const tbody = document.getElementById('transcript-table-body');
+            tbody.innerHTML = '';
+
+            courses.forEach(course => {
+                let res = currentUser.results && currentUser.results[course];
+                let tr = document.createElement('tr');
+                if (res) {
+                    tr.innerHTML = `
+                        <td class="p-3.5 font-bold text-slate-800">${course}</td>
+                        <td class="p-3.5">${res.score} / 100 (${res.score}%)</td>
+                        <td class="p-3.5 font-extrabold text-amber-600">${res.grade}</td>
+                        <td class="p-3.5"><span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded">Completed & Passed</span></td>
+                    `;
+                } else {
+                    tr.innerHTML = `
+                        <td class="p-3.5 font-medium text-slate-600">${course}</td>
+                        <td class="p-3.5 text-slate-400">Not Taken</td>
+                        <td class="p-3.5 text-slate-400">-</td>
+                        <td class="p-3.5"><span class="px-2.5 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded">Pending Exam</span></td>
+                    `;
+                }
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>

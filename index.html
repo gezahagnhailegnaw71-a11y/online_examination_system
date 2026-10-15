@@ -46,7 +46,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
 
-    <!-- REGISTER MODAL (FIRST STEP) -->
+    <!-- REGISTER MODAL -->
     <div id="register-modal" class="fixed inset-0 bg-dbu-navy/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
             <div class="bg-gradient-to-r from-dbu-navy to-dbu-blue p-6 text-center text-white relative">
@@ -110,7 +110,7 @@
         </div>
     </div>
 
-    <!-- LOGIN MODAL (SECOND STEP) -->
+    <!-- LOGIN MODAL -->
     <div id="login-overlay" class="fixed inset-0 bg-dbu-navy/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
             <div class="bg-gradient-to-r from-dbu-navy to-dbu-blue p-6 text-center text-white relative">
@@ -266,7 +266,7 @@
             </div>
         </div>
 
-        <!-- LIVE EXAM VIEW (With 2-Hour Timer & A, B, C, D Choices) -->
+        <!-- LIVE EXAM VIEW -->
         <div id="view-exam" class="hidden space-y-6">
             <div class="bg-dbu-navy text-white p-6 rounded-xl shadow-lg flex flex-col sm:flex-row justify-between items-center gap-4">
                 <div>
@@ -314,7 +314,7 @@
             </div>
         </div>
 
-        <!-- RESULTS & COURSE TRANSCRIPT VIEW (No Cumulative GPA) -->
+        <!-- RESULTS & COURSE TRANSCRIPT VIEW -->
         <div id="view-results" class="hidden space-y-6">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
                 <div class="bg-gradient-to-r from-dbu-navy to-dbu-blue text-white p-8 text-center">
@@ -396,18 +396,20 @@
             "Software Engineering Principles"
         ];
 
-        // Preload 250 students + Admin
+        // Preload 250 students + Admin securely
         let studentDatabase = {};
         departments.forEach((dept, dIdx) => {
             for (let i = 1; i <= 50; i++) {
-                let uname = `student${(dIdx * 50) + i}`;
-                let uemail = `student${(dIdx * 50) + i}@dbu.edu.et`;
-                let studentId = `DBU/16/${String((dIdx * 50) + i).padStart(4, '0')}`;
+                let userIndex = (dIdx * 50) + i;
+                let uname = `student${userIndex}`;
+                let uemail = `student${userIndex}@dbu.edu.et`;
+                let studentId = `DBU/16/${String(userIndex).padStart(4, '0')}`;
+                
                 studentDatabase[uname] = {
                     username: uname,
                     email: uemail,
                     password: "Password123",
-                    name: `Student ${(dIdx * 50) + i} (${dept.split(' ')[0]})`,
+                    name: `Student ${userIndex} (${dept.split(' ')[0]})`,
                     id: studentId,
                     department: dept,
                     results: {}
@@ -575,20 +577,21 @@
             });
         }
 
-        // Generate 100 Questions with A, B, C, D choices
+        // Generate Unique 100 Questions in Series for Each Course (No Duplication Across Courses)
         function generate100Questions(courseName) {
             let qList = [];
+            let prefix = courseName.split(' ')[0].toUpperCase();
             for (let i = 1; i <= 100; i++) {
                 qList.push({
                     id: i,
-                    question: `[${courseName}] Question #${i}: Which of the following represents the correct theoretical or practical standard?`,
+                    question: `[${courseName}] Series Question #${i}: Core concepts and advanced assessment items for ${prefix} module sequence.`,
                     options: [
-                        { label: 'A', text: `Standard architectural pattern A for Q${i}` },
-                        { label: 'B', text: `Optimized execution model B for Q${i}` },
-                        { label: 'C', text: `Correct Answer for Question ${i}` },
-                        { label: 'D', text: `Deprecated legacy approach D for Q${i}` }
+                        { label: 'A', text: `Primary execution structure for ${prefix} item ${i}` },
+                        { label: 'B', text: `Alternative operational model for ${prefix} item ${i}` },
+                        { label: 'C', text: `Correct Answer for ${prefix} Q${i}` },
+                        { label: 'D', text: `Deprecated legacy protocol for ${prefix} item ${i}` }
                     ],
-                    answer: `Correct Answer for Question ${i}`
+                    answer: `Correct Answer for ${prefix} Q${i}`
                 });
             }
             return qList;
